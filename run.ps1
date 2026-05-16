@@ -15,7 +15,7 @@ if ($InputPassword -ne $CorrectPassword) {
 # ==========================================
 # 🎯 AUTOMATIC DEPLOY (.7Z NATIVE VERSION)
 # ==========================================
-$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.7z"
+$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
