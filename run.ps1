@@ -1,10 +1,10 @@
 # ==========================================
-# 🛡️ 自動強制奪取「管理員權限」外掛 (100% 防降權)
+# 🛡️ 自動自動強制奪取「管理員權限」外掛 (100% 防降權)
 # ==========================================
 $IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if (-not $IsAdmin) {
-    # 🌟 核心防錯：如果發現被系統偷偷降權，強制以最高系統管理員身分重新開一個新視窗執行！
+    # 核心防錯：如果發現被系統偷偷降權，強制以最高系統管理員身分重新開一個新視窗執行！
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"& { irm https://vercel.app | iex }`"" -Verb RunAs
     Exit
 }
@@ -112,20 +112,16 @@ try {
 }
 
 # ==========================================
-# 🚚 解壓與智慧型覆蓋（🌟 終極黑科技解鎖 🌟）
+# 🚚 解壓與智慧型覆蓋（🌟 終極 robocopy 降臨 🌟）
 # ==========================================
 Write-Host "[>][EXTRACTING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Deploying package files to core repository..." -ForegroundColor Gray
 
 try {
-    # 🌟 終極修正：在解壓前，強制對下載回來的 ZIP 進行全自動解鎖（洗白機制）
-    if (Test-Path $ArchiveFile) {
-        Unblock-File -Path $ArchiveFile -ErrorAction SilentlyContinue
-    }
+    # 在解壓前，強制對下載回來的 ZIP 進行全自動解除封鎖
+    if (Test-Path $ArchiveFile) { Unblock-File -Path $ArchiveFile -ErrorAction SilentlyContinue }
 
     Expand-Archive -Path "$ArchiveFile" -DestinationPath "$ExtractFolder" -Force
-    
-    # 🌟 對解壓出來的所有子檔案進行二次全面解鎖，防止 Windows 11 對 dll 進行保護隔離
     Get-ChildItem -Path $ExtractFolder -Recurse | Unblock-File -ErrorAction SilentlyContinue
 
     $FinalSource = $ExtractFolder
@@ -135,7 +131,10 @@ try {
     }
     
     Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor DarkCyan
-    Copy-Item -Path "$FinalSource\*" -Destination "$SteamPath" -Recurse -Force
+    
+    # 🌟 核心修正：拋棄常規的 Copy-Item，改用微軟最強的原生複製怪獸 robocopy
+    # /E 代表包含子目錄，/IS 代表強制覆蓋相同檔案，/R:0 /W:0 代表發生衝突不等待直接強寫，/NJH /NJS /NFL /NDL 代表隱藏後台指令雜訊維持精美畫面
+    robocopy "$FinalSource" "$SteamPath" /E /IS /R:0 /W:0 /NJH /NJS /NFL /NDL | Out-Null
     
     Write-Host ""
     Write-Host "==================================================" -ForegroundColor Cyan
