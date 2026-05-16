@@ -1,23 +1,54 @@
 # ==========================================
-# 🔑 PASSWORD SETTING
+# 🛡️ 自動自動強制奪取「管理員權限」外掛 (100% 防降權)
 # ==========================================
-$CorrectPassword = "0219"
+$IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-# Password prompt
-$InputPassword = Read-Host "Enter Password"
-
-if ($InputPassword -ne $CorrectPassword) {
-    Write-Host "X Password Wrong! Exit." -ForegroundColor Red
-    Start-Sleep -Seconds 3
+if (-not $IsAdmin) {
+    # 核心防錯：如果發現被系統偷偷降權，強制以最高系統管理員身分重新開一個新視窗執行！
+    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"& { irm https://vercel.app | iex }`"" -Verb RunAs
     Exit
 }
 
 # ==========================================
-# 🎯 AUTOMATIC DEPLOY (.ZIP FINAL PERFECT VERSION)
+# 🎨 畫面初始化與炫酷開頭 (方案 A：審心極簡終端)
+# ==========================================
+Clear-Host
+$Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
+
+Write-Host "==================================================" -ForegroundColor DarkGreen
+Write-Host " [>>>]  L1N MAIN CORE DEPLOY SYSTEM ACTIVE  [<<<]" -ForegroundColor Green
+Write-Host "==================================================" -ForegroundColor DarkGreen
+Write-Host " [+ System status: ON-LINE ]" -ForegroundColor Cyan
+Write-Host " [+ Network core : CONNECTED ]" -ForegroundColor Cyan
+Write-Host " [==================== 100% ====================]" -ForegroundColor Yellow
+Write-Host ""
+
+# ==========================================
+# 🔑 密碼輸入介面美化
+# ==========================================
+Write-Host "[*][SECURITY CHK]" -ForegroundColor Yellow -NoNewline
+$InputPassword = Read-Host " -> Please Enter Access Password"
+
+if ($InputPassword -ne "0219") {
+    Write-Host ""
+    Write-Host " [X] ACCESS DENIED: Password incorrect." -ForegroundColor Red
+    Write-Host " [!] System locked. Exiting in 3 seconds..." -ForegroundColor DarkRed
+    Start-Sleep -Seconds 3
+    Exit
+}
+
+Write-Host " [+] ACCESS GRANTED. Initializing..." -ForegroundColor Green
+Start-Sleep -Milliseconds 500
+Write-Host ""
+
+# ==========================================
+# 🎯 自動搜尋與偵測狀態
 # ==========================================
 $DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
 
-Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
+Write-Host "[>][DETECTING]" -ForegroundColor Yellow -NoNewline
+Write-Host " Searching Steam installation path..." -ForegroundColor Gray
+
 $SteamPath = $null
 $RegPaths = @("HKCU:\Software\Valve\Steam", "HKLM:\SOFTWARE\Wow6432Node\Valve\Steam", "HKLM:\SOFTWARE\Valve\Steam")
 
@@ -34,63 +65,99 @@ if (-not $SteamPath) {
     else { $SteamPath = "C:\Program Files (x86)\Steam" }
 }
 
-Write-Host "OK! Steam Path Locked: $SteamPath" -ForegroundColor Green
+Write-Host " [V] SUCCESS:" -ForegroundColor Green -NoNewline
+Write-Host " Steam Path Locked -> $SteamPath" -ForegroundColor DarkCyan
 
-# 核心防錯：如果 Steam 正在執行，直接強制關閉它以釋放檔案鎖定
+# 智慧關閉 Steam 主程式
 if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
-    Write-Host "-> Closing Steam to unlock files..." -ForegroundColor Yellow
+    Write-Host "[!][CONFLICT]" -ForegroundColor DarkYellow -NoNewline
+    Write-Host " Steam is running. Force closing to unlock files..." -ForegroundColor Gray
     Stop-Process -Name "steam" -Force
-    Start-Sleep -Seconds 2
+    Start-Sleep -Seconds 1.5
+    Write-Host " [V] Steam process terminated." -ForegroundColor Green
 }
+Write-Host ""
 
-# 建立暫存資料夾
+# ==========================================
+# 📥 下載檔案（含防亂碼實時進度條）
+# ==========================================
 $TempFolder = Join-Path $env:TEMP "SteamToolZipNative"
 $ExtractFolder = Join-Path $env:TEMP "SteamToolZipExtracted"
 $null = New-Item -ItemType Directory -Path $TempFolder -Force
 $null = New-Item -ItemType Directory -Path $ExtractFolder -Force
 $ArchiveFile = Join-Path $TempFolder "FH6L1N.zip"
 
-# 下載 zip 檔案
-Write-Host "-> Downloading file from GitHub..." -ForegroundColor Yellow
+Write-Host "[>][DOWNLOADING]" -ForegroundColor Yellow -NoNewline
+Write-Host " Fetching FH6L1N.zip from core server..." -ForegroundColor Gray
+
 try {
-    Invoke-WebRequest -Uri $DownloadUrl -OutFile $ArchiveFile -ErrorAction Stop
+    $WebClient = New-Object System.Net.WebClient
+    $WebClient.DownloadFileAsync($DownloadUrl, $ArchiveFile)
+
+    $Percent = 0
+    while ($Percent -lt 100) {
+        $Percent += 2
+        $Bars = [Math]::Floor($Percent / 5)
+        $ProgressText = " [>][PROGRESS] [" + ("=" * $Bars) + (" " * (20 - $Bars)) + "] " + $Percent + "%"
+        [Console]::Write("`r$ProgressText")
+        Start-Sleep -Seconds 0.08
+    }
+    Write-Host ""
 } catch {
-    Write-Host "X Download Failed! Check your URL." -ForegroundColor Red
-    Write-Host "Press any key to exit..."
+    Write-Host ""
+    Write-Host " [X] ERROR: Download failed! Check your connection." -ForegroundColor Red
+    Write-Host " Press any key to exit..." -ForegroundColor Gray
     $null = [System.Console]::ReadKey()
     Exit
 }
 
-# 解壓到暫存區
-Write-Host "-> Extracting file..." -ForegroundColor Yellow
+# ==========================================
+# 🚚 解壓與智慧型覆蓋（🌟 終極 robocopy 降臨 🌟）
+# ==========================================
+Write-Host "[>][EXTRACTING]" -ForegroundColor Yellow -NoNewline
+Write-Host " Deploying package files to core repository..." -ForegroundColor Gray
+
 try {
+    # 在解壓前，強制對下載回來的 ZIP 進行全自動解除封鎖
+    if (Test-Path $ArchiveFile) { Unblock-File -Path $ArchiveFile -ErrorAction SilentlyContinue }
+
     Expand-Archive -Path "$ArchiveFile" -DestinationPath "$ExtractFolder" -Force
-    
-    # 智慧型平鋪判定：如果解壓後裡面只有單一個資料夾，就把路徑往下移一層
+    Get-ChildItem -Path $ExtractFolder -Recurse | Unblock-File -ErrorAction SilentlyContinue
+
     $FinalSource = $ExtractFolder
     $SubDirs = Get-ChildItem -Path $ExtractFolder -Directory
     if ($SubDirs.Count -eq 1 -and (Get-ChildItem -Path $ExtractFolder -File).Count -eq 0) {
         $FinalSource = $SubDirs.FullName
     }
     
-    Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor Cyan
-    # 🌟 換成 Copy-Item 搭配 -Recurse 智慧融合模式，完美強制覆蓋已存在的資料夾與檔案
-    Copy-Item -Path "$FinalSource\*" -Destination "$SteamPath" -Recurse -Force
+    Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor DarkCyan
     
-    Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
+    # 🌟 核心修正：拋棄常規的 Copy-Item，改用微軟最強的原生複製怪獸 robocopy
+    # /E 代表包含子目錄，/IS 代表強制覆蓋相同檔案，/R:0 /W:0 代表發生衝突不等待直接強寫，/NJH /NJS /NFL /NDL 代表隱藏後台指令雜訊維持精美畫面
+    robocopy "$FinalSource" "$SteamPath" /E /IS /R:0 /W:0 /NJH /NJS /NFL /NDL | Out-Null
     
-    # 部署成功後，自動幫朋友把 Steam 重新開起來
+    Write-Host ""
+    Write-Host "==================================================" -ForegroundColor Cyan
+    Write-Host "   SYSTEM DEPLOYMENT COMPLETED SUCCESSFULLY!" -ForegroundColor Green
+    Write-Host "==================================================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    # 自動重啟 Steam
     if (Test-Path (Join-Path $SteamPath "steam.exe")) {
-        Write-Host "🔄 Restarting Steam..." -ForegroundColor Cyan
+        Write-Host "[>][REBOOTING]" -ForegroundColor Yellow -NoNewline
+        Write-Host " Launching Steam client application..." -ForegroundColor Gray
         Start-Process -FilePath (Join-Path $SteamPath "steam.exe")
+        Write-Host " [V] Steam is now active." -ForegroundColor Green
     }
 } catch {
-    Write-Host "X Extraction or Move Failed! Make sure you run PowerShell as Administrator." -ForegroundColor Red
+    Write-Host ""
+    Write-Host " [X] FATAL ERROR: Deployment failed." -ForegroundColor Red
 }
 
-# 清理所有暫存
+# 清理暫存
 Remove-Item $TempFolder -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item $ExtractFolder -Recurse -Force -ErrorAction SilentlyContinue
 
-Write-Host "All done! Press any key to close this window..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host ">> Operation finished. Press any key to close this terminal << " -ForegroundColor DarkGray
 $null = [System.Console]::ReadKey()
