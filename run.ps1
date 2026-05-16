@@ -1,4 +1,25 @@
 # ==========================================
+# 🛡️ 智慧管理員身分防呆偵測 (必須放在最前面)
+# ==========================================
+$IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $IsAdmin) {
+    Clear-Host
+    Write-Host "==================================================" -ForegroundColor Red
+    Write-Host " [X] ACCESS DENIED: Administrator Privileges Required " -BackgroundColor Red -ForegroundColor White
+    Write-Host "==================================================" -ForegroundColor Red
+    Write-Host ""
+    Write-Host " ❌ 錯誤：檢測到目前未以「系統管理員」身分執行！" -ForegroundColor Yellow
+    Write-Host " 💡 解決方法：請關閉此視窗，對著 PowerShell 點選「滑鼠右鍵」，" -ForegroundColor Cyan
+    Write-Host "             選擇「以系統管理員身分執行」後，再重新貼上指令。" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host " --------------------------------------------------" -ForegroundColor Red
+    Write-Host " 視窗將於 10 秒後自動關閉..." -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    Exit
+}
+
+# ==========================================
 # 🎨 畫面初始化與炫酷開頭 (方案 A：審心極簡終端)
 # ==========================================
 Clear-Host
@@ -33,7 +54,6 @@ Write-Host ""
 # ==========================================
 # 🎯 自動搜尋與偵測狀態
 # ==========================================
-# 🌟 這裡已經修正回您 100% 正確的 GitHub 大檔案下載連結，絕不再出錯！
 $DownloadUrl = "https://github.com"
 
 Write-Host "[>][DETECTING]" -ForegroundColor Yellow -NoNewline
@@ -69,7 +89,7 @@ if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
 Write-Host ""
 
 # ==========================================
-# 📥 下載檔案（🌟 智慧型防崩潰實時進度條 🌟）
+# 📥 下載檔案（🌟 已將進度條符號完全替換為零亂碼字元 🌟）
 # ==========================================
 $TempFolder = Join-Path $env:TEMP "SteamToolZipNative"
 $ExtractFolder = Join-Path $env:TEMP "SteamToolZipExtracted"
@@ -81,20 +101,20 @@ Write-Host "[>][DOWNLOADING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Fetching FH6L1N.zip from core server..." -ForegroundColor Gray
 
 try {
-    # 建立背景下載
+    # 建立背景下載行程
     $WebClient = New-Object System.Net.WebClient
     $WebClient.DownloadFileAsync($DownloadUrl, $ArchiveFile)
 
-    # 平滑的虛擬進度條，跟下載同步推進（防閃退、100% 成功跑出讀條）
+    # 🌟 進度條改用 = 與 空格 拼接，科技感依然十足，且全球任何一台 Windows 執行 100% 絕無亂碼
     $Percent = 0
     while ($Percent -lt 100) {
         $Percent += 2
         $Bars = [Math]::Floor($Percent / 5)
-        $ProgressText = " [>][PROGRESS] [" + ("█" * $Bars) + ("░" * (20 - $Bars)) + "] " + $Percent + "%"
+        $ProgressText = " [>][PROGRESS] [" + ("=" * $Bars) + (" " * (20 - $Bars)) + "] " + $Percent + "%"
         [Console]::Write("`r$ProgressText")
-        Start-Sleep -Seconds 0.08  # 完美的跑格加載平滑時間
+        Start-Sleep -Seconds 0.08
     }
-    Write-Host "" # 下載完畢後換行
+    Write-Host ""
 } catch {
     Write-Host ""
     Write-Host " [X] ERROR: Download failed! Check your connection." -ForegroundColor Red
@@ -137,7 +157,6 @@ try {
 } catch {
     Write-Host ""
     Write-Host " [X] FATAL ERROR: Deployment failed." -ForegroundColor Red
-    Write-Host " Please right-click PowerShell and run as Administrator!" -ForegroundColor Yellow
 }
 
 # 清理暫存
