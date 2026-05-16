@@ -12,7 +12,8 @@ if (-not $IsAdmin) {
 # ==========================================
 # 🎨 畫面初始化與炫酷開頭 (方案 A：審心極簡終端)
 # ==========================================
-
+Clear-Host
+$Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
 
 Write-Host "==================================================" -ForegroundColor DarkGreen
 Write-Host " [>>>]  L1N MAIN CORE DEPLOY SYSTEM ACTIVE  [<<<]" -ForegroundColor Green
