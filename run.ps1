@@ -68,7 +68,7 @@ if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
 Write-Host ""
 
 # ==========================================
-# 📥 下載檔案（🌟 這裡已換成 100% 必成功的實時文字讀條 🌟）
+# 📥 下載檔案（🌟 換成 100% 防閃退實時文字讀條核心 🌟）
 # ==========================================
 $TempFolder = Join-Path $env:TEMP "SteamToolZipNative"
 $ExtractFolder = Join-Path $env:TEMP "SteamToolZipExtracted"
@@ -80,29 +80,36 @@ Write-Host "[>][DOWNLOADING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Fetching FH6L1N.zip from core server..." -ForegroundColor Gray
 
 try {
-    # 🌟 拋棄原廠不穩定的頂部面板，改用 WebClient 來精準監聽下載進度
-    $WebClient = New-Object System.Net.WebClient
+    # 🌟 改用 HttpClient 同步下載核心，防止系統強制搶先執行結尾
+    $HttpClient = New-Object System.Net.Http.HttpClient
+    $Response = $HttpClient.GetAsync($DownloadUrl, [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead).Result
     
-    # 建立自訂的進度條刷新事件
-    $OnProgress = {
-        param($sender, $e)
-        $Percent = $e.ProgressPercentage
+    if (-not $Response.IsSuccessStatusCode) { throw "Download Error" }
+    
+    $TotalBytes = $Response.Content.Headers.ContentLength
+    $Stream = $Response.Content.ReadAsStreamAsync().Result
+    $FileStream = [System.IO.File]::Create($ArchiveFile)
+    $Buffer = New-Object byte[] 4096
+    $BytesRead = 0
+    $TotalBytesRead = 0
+
+    while (($BytesRead = $Stream.Read($Buffer, 0, $Buffer.Length)) -gt 0) {
+        $FileStream.Write($Buffer, 0, $BytesRead)
+        $TotalBytesRead += $BytesRead
         
-        # 計算一條總共 20 格的進度條要亮幾格
-        $Bars = [Math]::Floor($Percent / 5)
-        $ProgressText = " [>][PROGRESS] [" + ("█" * $Bars) + ("░" * (20 - $Bars)) + "] " + $Percent + "%"
-        
-        # \r 能讓游標回到該行開頭重新複寫，達成真正的文字跑馬燈動態更新
-        [Console]::Write("`r$ProgressText")
+        if ($TotalBytes) {
+            # 精準計算百分比並每 5% 亮一格方塊 (共 20 格)
+            $Percent = [Math]::Floor(($TotalBytesRead / $TotalBytes) * 100)
+            $Bars = [Math]::Floor($Percent / 5)
+            $ProgressText = " [>][PROGRESS] [" + ("█" * $Bars) + ("░" * (20 - $Bars)) + "] " + $Percent + "%"
+            [Console]::Write("`r$ProgressText")
+        }
     }
-    
-    # 綁定監聽器並啟動非同步異步下載
-    $WebClient.add_DownloadProgressChanged($OnProgress)
-    $DownloadTask = $WebClient.DownloadFileTaskAsync($DownloadUrl, $ArchiveFile)
-    
-    # 等待下載完成
-    while (-not $DownloadTask.IsCompleted) { Start-Sleep -Milliseconds 50 }
-    Write-Host "" # 下載完換行
+
+    $FileStream.Close()
+    $Stream.Close()
+    $HttpClient.Dispose()
+    Write-Host "" # 下載完畢換行
 } catch {
     Write-Host ""
     Write-Host " [X] ERROR: Download failed! Check your connection or GitHub URL." -ForegroundColor Red
