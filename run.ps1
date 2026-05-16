@@ -1,21 +1,37 @@
 # ==========================================
-# 🔑 PASSWORD SETTING
+# INITIALIZATION & DISPLAY INTERFACE
 # ==========================================
-$CorrectPassword = "0219"
+Clear-Host
+$Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
 
-# Password prompt
-$InputPassword = Read-Host "Enter Password"
+Write-Host "==================================================" -ForegroundColor DarkGreen
+Write-Host " [>>>]  L1N MAIN CORE DEPLOY SYSTEM ACTIVE  [<<<]" -ForegroundColor Green
+Write-Host "==================================================" -ForegroundColor DarkGreen
+Write-Host " [+ System status: ON-LINE ]" -ForegroundColor Cyan
+Write-Host " [+ Network core : CONNECTED ]" -ForegroundColor Cyan
+Write-Host " [==================== 100% ====================]" -ForegroundColor Yellow
+Write-Host ""
 
-if ($InputPassword -ne $CorrectPassword) {
+# ==========================================
+# SECURITY PASSWORD VERIFICATION
+# ==========================================
+Write-Host "[*][SECURITY CHK]" -ForegroundColor Yellow -NoNewline
+$InputPassword = Read-Host " -> Please Enter Access Password"
+
+if ($InputPassword -ne "0219") {
     Write-Host "X Password Wrong! Exit." -ForegroundColor Red
     Start-Sleep -Seconds 3
     Exit
 }
 
+Write-Host " [+] ACCESS GRANTED. Initializing..." -ForegroundColor Green
+Start-Sleep -Milliseconds 500
+Write-Host ""
+
 # ==========================================
-# 🎯 AUTOMATIC DEPLOY (.ZIP FINAL PERFECT VERSION)
+# PATH DETECTION & AUTOMATIC DEPLOY
 # ==========================================
-$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
+$DownloadUrl = "https://github.com"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
@@ -36,21 +52,18 @@ if (-not $SteamPath) {
 
 Write-Host "OK! Steam Path Locked: $SteamPath" -ForegroundColor Green
 
-# 核心防錯：如果 Steam 正在執行，直接強制關閉它以釋放檔案鎖定
 if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
     Write-Host "-> Closing Steam to unlock files..." -ForegroundColor Yellow
     Stop-Process -Name "steam" -Force
     Start-Sleep -Seconds 2
 }
 
-# 建立暫存資料夾
 $TempFolder = Join-Path $env:TEMP "SteamToolZipNative"
 $ExtractFolder = Join-Path $env:TEMP "SteamToolZipExtracted"
 $null = New-Item -ItemType Directory -Path $TempFolder -Force
 $null = New-Item -ItemType Directory -Path $ExtractFolder -Force
 $ArchiveFile = Join-Path $TempFolder "FH6L1N.zip"
 
-# 下載 zip 檔案
 Write-Host "-> Downloading file from GitHub..." -ForegroundColor Yellow
 try {
     Invoke-WebRequest -Uri $DownloadUrl -OutFile $ArchiveFile -ErrorAction Stop
@@ -61,12 +74,10 @@ try {
     Exit
 }
 
-# 解壓到暫存區
 Write-Host "-> Extracting file..." -ForegroundColor Yellow
 try {
     Expand-Archive -Path "$ArchiveFile" -DestinationPath "$ExtractFolder" -Force
     
-    # 智慧型平鋪判定：如果解壓後裡面只有單一個資料夾，就把路徑往下移一層
     $FinalSource = $ExtractFolder
     $SubDirs = Get-ChildItem -Path $ExtractFolder -Directory
     if ($SubDirs.Count -eq 1 -and (Get-ChildItem -Path $ExtractFolder -File).Count -eq 0) {
@@ -74,12 +85,14 @@ try {
     }
     
     Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor Cyan
-    # 🌟 換成 Copy-Item 搭配 -Recurse 智慧融合模式，完美強制覆蓋已存在的資料夾與檔案
     Copy-Item -Path "$FinalSource\*" -Destination "$SteamPath" -Recurse -Force
     
-    Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "==================================================" -ForegroundColor Cyan
+    Write-Host "   SYSTEM DEPLOYMENT COMPLETED SUCCESSFULLY!" -ForegroundColor Green
+    Write-Host "==================================================" -ForegroundColor Cyan
+    Write-Host ""
     
-    # 部署成功後，自動幫朋友把 Steam 重新開起來
     if (Test-Path (Join-Path $SteamPath "steam.exe")) {
         Write-Host "🔄 Restarting Steam..." -ForegroundColor Cyan
         Start-Process -FilePath (Join-Path $SteamPath "steam.exe")
@@ -88,9 +101,9 @@ try {
     Write-Host "X Extraction or Move Failed! Make sure you run PowerShell as Administrator." -ForegroundColor Red
 }
 
-# 清理所有暫存
 Remove-Item $TempFolder -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item $ExtractFolder -Recurse -Force -ErrorAction SilentlyContinue
 
-Write-Host "All done! Press any key to close this window..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host ">> Operation finished. Press any key to close this terminal << " -ForegroundColor DarkGray
 $null = [System.Console]::ReadKey()
