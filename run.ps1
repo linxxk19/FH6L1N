@@ -13,7 +13,7 @@ if ($InputPassword -ne $CorrectPassword) {
 }
 
 # ==========================================
-# 🎯 AUTOMATIC DEPLOY (.7Z PERFECT VERSION)
+# 🎯 AUTOMATIC DEPLOY (.7Z NATIVE VERSION)
 # ==========================================
 $DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.7z"
 
@@ -37,7 +37,7 @@ if (-not $SteamPath) {
 Write-Host "OK! Steam Path Locked" -ForegroundColor Green
 
 # Create temp folder
-$TempFolder = Join-Path $env:TEMP "SteamTool7zTemp"
+$TempFolder = Join-Path $env:TEMP "SteamTool7zNative"
 $null = New-Item -ItemType Directory -Path $TempFolder -Force
 $ArchiveFile = Join-Path $TempFolder "FH6L1N.7z"
 
@@ -52,28 +52,18 @@ try {
     Exit
 }
 
-# Download 7-Zip Core
-Write-Host "-> Preparing 7-Zip core..." -ForegroundColor Cyan
-$7zExe = Join-Path $TempFolder "7za.exe"
-$7zUrl = "https://7-zip.org"
-$7zZip = Join-Path $TempFolder "7za.zip"
-Invoke-WebRequest -Uri $7zUrl -OutFile $7zZip
-Expand-Archive -Path $7zZip -DestinationPath $TempFolder -Force
-
-# Extracting
+# Extracting via Windows Native tar.exe (Perfect for .7z)
 Write-Host "-> Extracting file to Steam folder..." -ForegroundColor Yellow
-if (Test-Path $7zExe) {
-    & $7zExe x "$ArchiveFile" "-o$SteamPath" -y | Out-Null
-} else {
-    Write-Host "X 7-Zip Core Missing!" -ForegroundColor Red
-    Write-Host "Press any key to exit..."
-    $null = [System.Console]::ReadKey()
-    Exit
+try {
+    # 使用 Windows 內建 tar 直接解壓 .7z 到 Steam 目錄
+    tar -xf "$ArchiveFile" -C "$SteamPath"
+    Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
+} catch {
+    Write-Host "X Extraction Failed!" -ForegroundColor Red
 }
 
 # Cleanup
 Remove-Item $TempFolder -Recurse -Force -ErrorAction SilentlyContinue
-Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
 
 Write-Host "All done! Press any key to close this window..." -ForegroundColor Cyan
 $null = [System.Console]::ReadKey()
