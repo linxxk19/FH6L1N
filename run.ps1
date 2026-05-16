@@ -1,20 +1,16 @@
 # ==========================================
-# 🎨 畫面初始化與炫酷開頭 (ASCII Art - 777 Edition)
+# 🎨 畫面初始化與炫酷開頭 (方案 A：實心極簡終端)
 # ==========================================
 Clear-Host
-$Host.UI.RawUI.WindowTitle = "777 v1.0"
+$Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
 
-# 青綠色到深藍色的酷炫科技感漸層 777 字體
-Write-Host "==================================================" -ForegroundColor DarkCyan
-Write-Host "   ______ ______ ______ " -ForegroundColor Green
-Write-Host "  |____  |____  |____  |" -ForegroundColor Green
-Write-Host "      / /     / /     / / " -ForegroundColor Cyan
-Write-Host "     / /     / /     / /  " -ForegroundColor Cyan
-Write-Host "    / /     / /     / /   " -ForegroundColor Blue
-Write-Host "   /_/     /_/     /_/    " -ForegroundColor Blue
-Write-Host "                          "
-Write-Host "       >> MAIN CORE DEPLOY ACTIVE v1.0 <<  " -ForegroundColor DarkCyan
-Write-Host "==================================================" -ForegroundColor DarkCyan
+Write-Host "==================================================" -ForegroundColor Cyan
+Write-Host " [ SYSTEM TERMINAL ACTIVE ] " -BackgroundColor DarkCyan -ForegroundColor White
+Write-Host "--------------------------------------------------" -ForegroundColor DarkCyan
+Write-Host "  CORE IDENTIFIER : L1N SYSTEM AUTOMATION" -ForegroundColor Green
+Write-Host "  DEPLOY OBJECT   : PREMIUM STEAM OVERRIDE v1.0" -ForegroundColor Cyan
+Write-Host "  SECURITY LEVEL  : ENCRYPTED ACCESS ONLY" -ForegroundColor Yellow
+Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ==========================================
