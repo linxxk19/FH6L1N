@@ -12,8 +12,9 @@ if ($InputPassword -ne $CorrectPassword) {
 }
 
 # ==========================================
-# 🎯 AUTOMATIC DEPLOY
+# 🎯 AUTOMATIC DEPLOY (.7Z PERFECT VERSION)
 # ==========================================
+# ⚠️ 請確保下方的下載網址是您上傳的最新 .7z 網址
 $DownloadUrl = "https://github.com"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
@@ -35,26 +36,33 @@ if (-not $SteamPath) {
 
 Write-Host "OK! Steam Path Locked: $SteamPath" -ForegroundColor Green
 
-# 建立暫存與下載
-$TempFolder = Join-Path $env:TEMP "SteamToolTemp"
+# 建立獨立暫存資料夾
+$TempFolder = Join-Path $env:TEMP "SteamTool7zTemp"
 $null = New-Item -ItemType Directory -Path $TempFolder -Force
-$TempFile = Join-Path $TempFolder "FH6L1N.rar"
+$ArchiveFile = Join-Path $TempFolder "FH6L1N.7z"
 
-Write-Host "-> Downloading file from GitHub..." -ForegroundColor Yellow
-Invoke-WebRequest -Uri $DownloadUrl -OutFile $TempFile
+# 📥 下載您的 .7z 主檔案
+Write-Host "-> Downloading .7z file from GitHub..." -ForegroundColor Yellow
+Invoke-WebRequest -Uri $DownloadUrl -OutFile $ArchiveFile
 
-Write-Host "-> Extracting file to Steam folder..." -ForegroundColor Yellow
-# 🌟 改用系統最底層的 Shell 核心，強行完美提取檔案
-$Shell = New-Object -ComObject Shell.Application
-$Folder = $Shell.NameSpace($TempFile)
-if ($Folder) {
-    $TargetFolder = $Shell.NameSpace($SteamPath)
-    $TargetFolder.CopyHere($Folder.Items(), 16)
+# 🧰 背景下載官方 7-Zip 免安裝獨立執行檔（用來處理 .7z 解壓）
+Write-Host "-> Preparing 7-Zip core..." -ForegroundColor Cyan
+$7zExe = Join-Path $TempFolder "7za.exe"
+$7zUrl = "https://7-zip.org"
+$7zZip = Join-Path $TempFolder "7za.zip"
+Invoke-WebRequest -Uri $7zUrl -OutFile $7zZip
+Expand-Archive -Path $7zZip -DestinationPath $TempFolder -Force
+
+# 🚚 執行強制解壓縮與覆蓋
+Write-Host "-> Extracting .7z file to Steam folder..." -ForegroundColor Yellow
+if (Test-Path $7zExe) {
+    # -y 代表自動同意覆蓋所有檔案
+    & $7zExe x "$ArchiveFile" "-o$SteamPath" -y | Out-Null
 } else {
-    # 備用機制：如果點對點失敗，直接用 PowerShell 原生解壓
-    Expand-Archive -Path $TempFile -DestinationPath $SteamPath -Force
+    Write-Host "X 7-Zip Core Missing! Extraction failed." -ForegroundColor Red
+    Exit
 }
 
-# 清理暫存檔
+# ✨ 清理所有暫存檔案
 Remove-Item $TempFolder -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
