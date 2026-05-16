@@ -4,14 +4,20 @@
 Clear-Host
 $Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
 
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host " [ SYSTEM TERMINAL ACTIVE ] " -BackgroundColor DarkCyan -ForegroundColor White
-Write-Host "--------------------------------------------------" -ForegroundColor DarkCyan
-Write-Host "  CORE IDENTIFIER : L1N SYSTEM AUTOMATION" -ForegroundColor Green
-Write-Host "  DEPLOY OBJECT   : PREMIUM STEAM OVERRIDE v1.0" -ForegroundColor Cyan
-Write-Host "  SECURITY LEVEL  : ENCRYPTED ACCESS ONLY" -ForegroundColor Yellow
-Write-Host "==================================================" -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Red
+Write-Host " $$$$$$$$\ $$$$$$$$\ $$$$$$$$\ " -ForegroundColor Red
+Write-Host " \____$$  |\____$$  |\____$$  |" -ForegroundColor Red
+Write-Host "     $$  /     $$  /     $$  / " -ForegroundColor Red
+Write-Host "    $$  /     $$  /     $$  /  " -ForegroundColor Red
+Write-Host "   $$  /     $$  /     $$  /   " -ForegroundColor Red
+Write-Host "  $$  /     $$  /     $$  /    " -ForegroundColor Red
+Write-Host " $$  /     $$  /     $$  /     " -ForegroundColor Red
+Write-Host " \__/      \__/      \__/      " -ForegroundColor Red
+Write-Host "                               " -ForegroundColor Red
+Write-Host "       >> MAIN CORE DEPLOY ACTIVE v1.0 <<  " -ForegroundColor Red
+Write-Host "==================================================" -ForegroundColor Red
 Write-Host ""
+
 
 # ==========================================
 # 🔑 密碼輸入介面美化
