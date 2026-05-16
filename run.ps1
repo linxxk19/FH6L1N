@@ -31,7 +31,7 @@ Write-Host ""
 # ==========================================
 # PATH DETECTION & AUTOMATIC DEPLOY
 # ==========================================
-$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
+$DownloadUrl = "https://github.com"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
@@ -76,7 +76,6 @@ try {
 
 Write-Host "-> Extracting file..." -ForegroundColor Yellow
 try {
-    # Unblock downloaded file to bypass Win11 security restriction
     if (Test-Path $ArchiveFile) { Unblock-File -Path $ArchiveFile -ErrorAction SilentlyContinue }
 
     Expand-Archive -Path "$ArchiveFile" -DestinationPath "$ExtractFolder" -Force
@@ -89,8 +88,6 @@ try {
     }
     
     Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor Cyan
-    
-    # 🌟 核心修正：改用最強悍的微軟原生 robocopy 指令，直接底層強行覆蓋 C:\Program Files (x86) 保護區
     robocopy "$FinalSource" "$SteamPath" /E /IS /R:0 /W:0 /NJH /NJS /NFL /NDL | Out-Null
     
     Write-Host ""
@@ -100,7 +97,8 @@ try {
     Write-Host ""
     
     if (Test-Path (Join-Path $SteamPath "steam.exe")) {
-        Write-Host "🔄 Restarting Steam..." -ForegroundColor Cyan
+        # 🌟 這裡已將 🔄 圖標剔除，改成標準純文字，永遠告別亂碼！
+        Write-Host "-> Restarting Steam..." -ForegroundColor Cyan
         Start-Process -FilePath (Join-Path $SteamPath "steam.exe")
     }
 } catch {
