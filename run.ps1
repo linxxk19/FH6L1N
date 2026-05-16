@@ -14,8 +14,7 @@ if ($InputPassword -ne $CorrectPassword) {
 # ==========================================
 # 🎯 AUTOMATIC DEPLOY (.7Z PERFECT VERSION)
 # ==========================================
-# ⚠️ 請確保下方的下載網址是您上傳的最新 .7z 網址
-$DownloadUrl = "https://github.com"
+$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.7z"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
