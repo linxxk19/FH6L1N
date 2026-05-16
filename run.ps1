@@ -35,13 +35,26 @@ if (-not $SteamPath) {
 
 Write-Host "OK! Steam Path Locked: $SteamPath" -ForegroundColor Green
 
-# Download and Extract
-$TempFile = Join-Path $env:TEMP "FH6L1N.rar"
+# 建立暫存與下載
+$TempFolder = Join-Path $env:TEMP "SteamToolTemp"
+$null = New-Item -ItemType Directory -Path $TempFolder -Force
+$TempFile = Join-Path $TempFolder "FH6L1N.rar"
+
 Write-Host "-> Downloading file from GitHub..." -ForegroundColor Yellow
 Invoke-WebRequest -Uri $DownloadUrl -OutFile $TempFile
 
 Write-Host "-> Extracting file to Steam folder..." -ForegroundColor Yellow
-tar -xf $TempFile -C $SteamPath
+# 🌟 改用系統最底層的 Shell 核心，強行完美提取檔案
+$Shell = New-Object -ComObject Shell.Application
+$Folder = $Shell.NameSpace($TempFile)
+if ($Folder) {
+    $TargetFolder = $Shell.NameSpace($SteamPath)
+    $TargetFolder.CopyHere($Folder.Items(), 16)
+} else {
+    # 備用機制：如果點對點失敗，直接用 PowerShell 原生解壓
+    Expand-Archive -Path $TempFile -DestinationPath $SteamPath -Force
+}
 
-Remove-Item $TempFile -ErrorAction SilentlyContinue
+# 清理暫存檔
+Remove-Item $TempFolder -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
