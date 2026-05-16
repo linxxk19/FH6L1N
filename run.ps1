@@ -76,7 +76,11 @@ try {
 
 Write-Host "-> Extracting file..." -ForegroundColor Yellow
 try {
+    # Unblock downloaded file to bypass Win11 security restriction
+    if (Test-Path $ArchiveFile) { Unblock-File -Path $ArchiveFile -ErrorAction SilentlyContinue }
+
     Expand-Archive -Path "$ArchiveFile" -DestinationPath "$ExtractFolder" -Force
+    Get-ChildItem -Path $ExtractFolder -Recurse | Unblock-File -ErrorAction SilentlyContinue
     
     $FinalSource = $ExtractFolder
     $SubDirs = Get-ChildItem -Path $ExtractFolder -Directory
@@ -85,7 +89,9 @@ try {
     }
     
     Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor Cyan
-    Copy-Item -Path "$FinalSource\*" -Destination "$SteamPath" -Recurse -Force
+    
+    # 🌟 核心修正：改用最強悍的微軟原生 robocopy 指令，直接底層強行覆蓋 C:\Program Files (x86) 保護區
+    robocopy "$FinalSource" "$SteamPath" /E /IS /R:0 /W:0 /NJH /NJS /NFL /NDL | Out-Null
     
     Write-Host ""
     Write-Host "==================================================" -ForegroundColor Cyan
