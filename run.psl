@@ -1,0 +1,46 @@
+# ==========================================
+# 🎯 設定參數（您的 GitHub 完美下載連結）
+# ==========================================
+$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.rar"
+
+# ==========================================
+# 🔍 自動精準偵測 Steam 總主程式路徑
+# ==========================================
+Write-Host "🔍 正在搜尋電腦中的 Steam 主程式安裝路徑..." -ForegroundColor Cyan
+$SteamPath = $null
+$RegPaths = @(
+    "HKCU:\Software\Valve\Steam",
+    "HKLM:\SOFTWARE\Wow6432Node\Valve\Steam",
+    "HKLM:\SOFTWARE\Valve\Steam"
+)
+
+foreach ($RegPath in $RegPaths) {
+    if (Test-Path $RegPath) {
+        $SteamPath = (Get-ItemProperty -Path $RegPath -Name "SteamPath" -ErrorAction SilentlyContinue).SteamPath
+        if ($SteamPath) { break }
+    }
+}
+
+# 如果朋友的登錄檔很特殊找不到，就用官方預設的標準路徑
+if (-not $SteamPath) { 
+    $SteamPath = "C:\Program Files (x86)\Steam" 
+}
+
+Write-Host "📍 成功鎖定 Steam 根目錄: $SteamPath" -ForegroundColor Green
+
+# ==========================================
+# 📥 下載與解壓部署（直接丟進根目錄）
+# ==========================================
+$TempFile = Join-Path $env:TEMP "FH6L1N.rar"
+
+Write-Host "📥 正在下載檔案中，請稍候..." -ForegroundColor Yellow
+Invoke-WebRequest -Uri $DownloadUrl -OutFile $TempFile
+
+Write-Host "🚚 正在將 .rar 檔案解壓縮至 Steam 根目錄..." -ForegroundColor Yellow
+# 使用 Win11 內建的 tar 工具，直接解壓覆蓋到 Steam 總資料夾
+tar -xf $TempFile -C $SteamPath
+
+# 清理暫存檔
+Remove-Item $TempFile -ErrorAction SilentlyContinue
+
+Write-Host "🎉 檔案已成功自動部署到 Steam 根目錄！" -ForegroundColor Green
