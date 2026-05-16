@@ -15,6 +15,9 @@ Write-Host ""
 # ==========================================
 # SECURITY PASSWORD VERIFICATION
 # ==========================================
+# Get the vertical cursor position before user input
+$StartLine = [Console]::CursorTop
+
 Write-Host "[*][SECURITY CHK]" -ForegroundColor Yellow -NoNewline
 $InputPassword = Read-Host " -> Please Enter Access Password"
 
@@ -24,14 +27,18 @@ if ($InputPassword -ne "0219") {
     Exit
 }
 
-Write-Host " [+] ACCESS GRANTED. Initializing..." -ForegroundColor Green
-Start-Sleep -Milliseconds 500
-Write-Host ""
+# 🌟 核心修正：驗證成功後，全自動精準向上抹除密碼輸入行 🌟
+$EndLine = [Console]::CursorTop
+for ($i = $StartLine; $i -lt $EndLine; $i++) {
+    [Console]::SetCursorPosition(0, $i)
+    [Console]::Write(" " * [Console]::WindowWidth)
+}
+[Console]::SetCursorPosition(0, $StartLine)
 
 # ==========================================
 # PATH DETECTION & AUTOMATIC DEPLOY
 # ==========================================
-$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
+$DownloadUrl = "https://github.com"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
@@ -97,7 +104,6 @@ try {
     Write-Host ""
     
     if (Test-Path (Join-Path $SteamPath "steam.exe")) {
-        # 🌟 這裡已將 🔄 圖標剔除，改成標準純文字，永遠告別亂碼！
         Write-Host "-> Restarting Steam..." -ForegroundColor Cyan
         Start-Process -FilePath (Join-Path $SteamPath "steam.exe")
     }
