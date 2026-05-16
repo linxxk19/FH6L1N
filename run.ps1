@@ -1,22 +1,22 @@
 # ==========================================
-# 🔑 請在下方設定您的專屬密碼（別人不知道就無法使用）
+# 🔑 PASSWORD SETTING
 # ==========================================
 $CorrectPassword = "0219"
 
-# 彈出密碼輸入提示
-$InputPassword = Read-Host "🔐 請輸入執行密碼"
+# Password prompt
+$InputPassword = Read-Host "Enter Password"
 
 if ($InputPassword -ne $CorrectPassword) {
-    Write-Host "❌ 密碼錯誤！拒絕存取，程式已終止。" -ForegroundColor Red
+    Write-Host "X Password Wrong! Exit." -ForegroundColor Red
     Exit
 }
 
 # ==========================================
-# 🎯 密碼正確才執行：自動下載並丟進 Steam 根目錄
+# 🎯 AUTOMATIC DEPLOY
 # ==========================================
-$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.rar"
+$DownloadUrl = "https://github.com"
 
-Write-Host "🔍 正在搜尋電腦中的 Steam 安裝路徑..." -ForegroundColor Cyan
+Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
 $RegPaths = @("HKCU:\Software\Valve\Steam", "HKLM:\SOFTWARE\Wow6432Node\Valve\Steam", "HKLM:\SOFTWARE\Valve\Steam")
 
@@ -33,15 +33,15 @@ if (-not $SteamPath) {
     else { $SteamPath = "C:\Program Files (x86)\Steam" }
 }
 
-Write-Host "📍 成功鎖定 Steam 根目錄: $SteamPath" -ForegroundColor Green
+Write-Host "OK! Steam Path Locked: $SteamPath" -ForegroundColor Green
 
-# 下載與解壓
+# Download and Extract
 $TempFile = Join-Path $env:TEMP "FH6L1N.rar"
-Write-Host "📥 正在下載檔案中，請稍候..." -ForegroundColor Yellow
+Write-Host "-> Downloading file from GitHub..." -ForegroundColor Yellow
 Invoke-WebRequest -Uri $DownloadUrl -OutFile $TempFile
 
-Write-Host "🚚 正在將檔案解壓縮至 Steam 根目錄..." -ForegroundColor Yellow
+Write-Host "-> Extracting file to Steam folder..." -ForegroundColor Yellow
 tar -xf $TempFile -C $SteamPath
 
 Remove-Item $TempFile -ErrorAction SilentlyContinue
-Write-Host "🎉 已成功部署到 Steam ！" -ForegroundColor Green
+Write-Host "SUCCESS! Enjoy your game." -ForegroundColor Green
