@@ -1,5 +1,5 @@
 # ==========================================
-# 🎨 畫面初始化與炫酷開頭 (方案 A：實心極簡終端)
+# 🎨 畫面初始化與炫酷開頭 (方案 A：審心極簡終端)
 # ==========================================
 Clear-Host
 $Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
@@ -9,14 +9,8 @@ Write-Host " [>>>]  L1N MAIN CORE DEPLOY SYSTEM ACTIVE  [<<<]" -ForegroundColor 
 Write-Host "==================================================" -ForegroundColor DarkGreen
 Write-Host " [+ System status: ON-LINE ]" -ForegroundColor Cyan
 Write-Host " [+ Network core : CONNECTED ]" -ForegroundColor Cyan
-Write-Host -NoNewline " [ " -ForegroundColor Red
-for ($i = 1; $i -le 20; $i++) {
-    Write-Host -NoNewline "█" -ForegroundColor Red
-    Start-Sleep -Milliseconds 60 # 👈 控制讀條速度，數字越小跑越快
-}
-Write-Host " 100% ]" -ForegroundColor Red
+Write-Host " [==================== 100% ====================]" -ForegroundColor Yellow
 Write-Host ""
-
 
 # ==========================================
 # 🔑 密碼輸入介面美化
@@ -74,7 +68,7 @@ if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
 Write-Host ""
 
 # ==========================================
-# 📥 下載檔案（含動態進度條美化）
+# 📥 下載檔案（🌟 已完美結合您要的原生下載讀條 🌟）
 # ==========================================
 $TempFolder = Join-Path $env:TEMP "SteamToolZipNative"
 $ExtractFolder = Join-Path $env:TEMP "SteamToolZipExtracted"
@@ -86,8 +80,12 @@ Write-Host "[>][DOWNLOADING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Fetching FH6L1N.zip from core server..." -ForegroundColor Gray
 
 try {
+    # 🌟 開啟微軟原廠下載百分比跑條面板
     $ProgressPreference = 'Continue'
+    
     Invoke-WebRequest -Uri $DownloadUrl -OutFile $ArchiveFile -ErrorAction Stop
+    
+    # 下載完後自動關閉進度面板
     $ProgressPreference = 'SilentlyContinue' 
 } catch {
     Write-Host ""
@@ -112,9 +110,8 @@ try {
         $FinalSource = $SubDirs.FullName
     }
     
-    # 執行完美覆蓋
+    Write-Host "-> Deploying and merging files directly to Steam..." -ForegroundColor DarkCyan
     Copy-Item -Path "$FinalSource\*" -Destination "$SteamPath" -Recurse -Force
-    Start-Sleep -Milliseconds 800
     
     Write-Host ""
     Write-Host "==================================================" -ForegroundColor Cyan
