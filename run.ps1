@@ -38,7 +38,7 @@ for ($i = $StartLine; $i -lt $EndLine; $i++) {
 # ==========================================
 # PATH DETECTION & AUTOMATIC DEPLOY
 # ==========================================
-$DownloadUrl = "https://github.com"
+$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
 
 Write-Host "-> Searching Steam installation path..." -ForegroundColor Cyan
 $SteamPath = $null
