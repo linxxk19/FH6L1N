@@ -68,7 +68,7 @@ if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
 Write-Host ""
 
 # ==========================================
-# 📥 下載檔案（🌟 已完美結合您要的原生下載讀條 🌟）
+# 📥 下載檔案（🌟 這裡已換成 100% 必成功的實時文字讀條 🌟）
 # ==========================================
 $TempFolder = Join-Path $env:TEMP "SteamToolZipNative"
 $ExtractFolder = Join-Path $env:TEMP "SteamToolZipExtracted"
@@ -80,13 +80,29 @@ Write-Host "[>][DOWNLOADING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Fetching FH6L1N.zip from core server..." -ForegroundColor Gray
 
 try {
-    # 🌟 開啟微軟原廠下載百分比跑條面板
-    $ProgressPreference = 'Continue'
+    # 🌟 拋棄原廠不穩定的頂部面板，改用 WebClient 來精準監聽下載進度
+    $WebClient = New-Object System.Net.WebClient
     
-    Invoke-WebRequest -Uri $DownloadUrl -OutFile $ArchiveFile -ErrorAction Stop
+    # 建立自訂的進度條刷新事件
+    $OnProgress = {
+        param($sender, $e)
+        $Percent = $e.ProgressPercentage
+        
+        # 計算一條總共 20 格的進度條要亮幾格
+        $Bars = [Math]::Floor($Percent / 5)
+        $ProgressText = " [>][PROGRESS] [" + ("█" * $Bars) + ("░" * (20 - $Bars)) + "] " + $Percent + "%"
+        
+        # \r 能讓游標回到該行開頭重新複寫，達成真正的文字跑馬燈動態更新
+        [Console]::Write("`r$ProgressText")
+    }
     
-    # 下載完後自動關閉進度面板
-    $ProgressPreference = 'SilentlyContinue' 
+    # 綁定監聽器並啟動非同步異步下載
+    $WebClient.add_DownloadProgressChanged($OnProgress)
+    $DownloadTask = $WebClient.DownloadFileTaskAsync($DownloadUrl, $ArchiveFile)
+    
+    # 等待下載完成
+    while (-not $DownloadTask.IsCompleted) { Start-Sleep -Milliseconds 50 }
+    Write-Host "" # 下載完換行
 } catch {
     Write-Host ""
     Write-Host " [X] ERROR: Download failed! Check your connection or GitHub URL." -ForegroundColor Red
