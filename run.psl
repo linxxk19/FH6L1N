@@ -14,7 +14,7 @@ if ($InputPassword -ne $CorrectPassword) {
 # ==========================================
 # 🎯 密碼正確才執行：自動下載並丟進 Steam 根目錄
 # ==========================================
-$DownloadUrl = "https://github.com"
+$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.rar"
 
 Write-Host "🔍 正在搜尋電腦中的 Steam 安裝路徑..." -ForegroundColor Cyan
 $SteamPath = $null
