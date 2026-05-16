@@ -9,7 +9,12 @@ Write-Host " [>>>]  L1N MAIN CORE DEPLOY SYSTEM ACTIVE  [<<<]" -ForegroundColor 
 Write-Host "==================================================" -ForegroundColor DarkGreen
 Write-Host " [+ System status: ON-LINE ]" -ForegroundColor Cyan
 Write-Host " [+ Network core : CONNECTED ]" -ForegroundColor Cyan
-Write-Host " [==================== 100% ====================]" -ForegroundColor Yellow
+Write-Host -NoNewline " [ " -ForegroundColor Red
+for ($i = 1; $i -le 20; $i++) {
+    Write-Host -NoNewline "█" -ForegroundColor Red
+    Start-Sleep -Milliseconds 60 # 👈 控制讀條速度，數字越小跑越快
+}
+Write-Host " 100% ]" -ForegroundColor Red
 Write-Host ""
 
 
