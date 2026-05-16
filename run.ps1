@@ -1,32 +1,32 @@
 # ==========================================
-# 🎨 畫面初始化與炫酷開頭 (ASCII Art)
+# 🎨 畫面初始化與炫酷開頭 (ASCII Art - 777 Edition)
 # ==========================================
 Clear-Host
-$Host.UI.RawUI.WindowTitle = "FH6L1N AUTOMATIC DEPLOY TOOL v1.0"
+$Host.UI.RawUI.WindowTitle = "777 v1.0"
 
-# 綠色與青色的漸層科技感標題
-Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "    ______ _    _   _____ _      _   _   _  " -ForegroundColor Green
-Write-Host "   |  ____| |  | | / ____| |    | \ | | | | " -ForegroundColor Green
-Write-Host "   | |__  | |__| || |  __| |    |  \| | | | " -ForegroundColor Cyan
-Write-Host "   |  __| |  __  || | |_ | |    | . \ | | | " -ForegroundColor Cyan
-Write-Host "   | |    | |  | || |__| | |____| |\  | |_| " -ForegroundColor Blue
-Write-Host "   |_|    |_|  |_| \_____|______|_| \_| (_) " -ForegroundColor Blue
-Write-Host "                                            "
-Write-Host "      >> PREMIUM STEAM DEPLOY TOOL v1.0 <<  " -ForegroundColor DarkCyan
-Write-Host "==================================================" -ForegroundColor Cyan
+# 青綠色到深藍色的酷炫科技感漸層 777 字體
+Write-Host "==================================================" -ForegroundColor DarkCyan
+Write-Host "   ______ ______ ______ " -ForegroundColor Green
+Write-Host "  |____  |____  |____  |" -ForegroundColor Green
+Write-Host "      / /     / /     / / " -ForegroundColor Cyan
+Write-Host "     / /     / /     / /  " -ForegroundColor Cyan
+Write-Host "    / /     / /     / /   " -ForegroundColor Blue
+Write-Host "   /_/     /_/     /_/    " -ForegroundColor Blue
+Write-Host "                          "
+Write-Host "       >> MAIN CORE DEPLOY ACTIVE v1.0 <<  " -ForegroundColor DarkCyan
+Write-Host "==================================================" -ForegroundColor DarkCyan
 Write-Host ""
 
 # ==========================================
 # 🔑 密碼輸入介面美化
 # ==========================================
-Write-Host "[🔑 SECURITY CHK]" -ForegroundColor Yellow -NoNewline
+Write-Host "[*][SECURITY CHK]" -ForegroundColor Yellow -NoNewline
 $InputPassword = Read-Host " -> Please Enter Access Password"
 
 if ($InputPassword -ne "0219") {
     Write-Host ""
     Write-Host " [X] ACCESS DENIED: Password incorrect." -ForegroundColor Red
-    Write-Host " 🔒 System locked. Exiting in 3 seconds..." -ForegroundColor DarkRed
+    Write-Host " [!] System locked. Exiting in 3 seconds..." -ForegroundColor DarkRed
     Start-Sleep -Seconds 3
     Exit
 }
@@ -38,10 +38,9 @@ Write-Host ""
 # ==========================================
 # 🎯 自動搜尋與偵測狀態
 # ==========================================
-# 🌟 這裡已精準修改為您最新的 GitHub .zip 下載網址
-$DownloadUrl = "https://github.com/linxxk19/FH6L1N/releases/download/FH6L1Nv1.0/FH6L1N.zip"
+$DownloadUrl = "https://github.com"
 
-Write-Host "[🔍 DETECTING]" -ForegroundColor Yellow -NoNewline
+Write-Host "[>][DETECTING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Searching Steam installation path..." -ForegroundColor Gray
 
 $SteamPath = $null
@@ -60,16 +59,16 @@ if (-not $SteamPath) {
     else { $SteamPath = "C:\Program Files (x86)\Steam" }
 }
 
-Write-Host " [✓] SUCCESS:" -ForegroundColor Green -NoNewline
+Write-Host " [V] SUCCESS:" -ForegroundColor Green -NoNewline
 Write-Host " Steam Path Locked -> $SteamPath" -ForegroundColor DarkCyan
 
 # 智慧關閉 Steam 主程式
 if (Get-Process -Name "steam" -ErrorAction SilentlyContinue) {
-    Write-Host "[⚠️ CONFLICT]" -ForegroundColor DarkYellow -NoNewline
+    Write-Host "[!][CONFLICT]" -ForegroundColor DarkYellow -NoNewline
     Write-Host " Steam is running. Force closing to unlock files..." -ForegroundColor Gray
     Stop-Process -Name "steam" -Force
     Start-Sleep -Seconds 1.5
-    Write-Host " [✓] Steam process terminated." -ForegroundColor Green
+    Write-Host " [V] Steam process terminated." -ForegroundColor Green
 }
 Write-Host ""
 
@@ -82,14 +81,13 @@ $null = New-Item -ItemType Directory -Path $TempFolder -Force
 $null = New-Item -ItemType Directory -Path $ExtractFolder -Force
 $ArchiveFile = Join-Path $TempFolder "FH6L1N.zip"
 
-Write-Host "[📥 DOWNLOADING]" -ForegroundColor Yellow -NoNewline
+Write-Host "[>][DOWNLOADING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Fetching FH6L1N.zip from core server..." -ForegroundColor Gray
 
 try {
-    # 開啟 PowerShell 內建的精美下載進度條提示
     $ProgressPreference = 'Continue'
     Invoke-WebRequest -Uri $DownloadUrl -OutFile $ArchiveFile -ErrorAction Stop
-    $ProgressPreference = 'SilentlyContinue' # 下載完關閉進度條
+    $ProgressPreference = 'SilentlyContinue' 
 } catch {
     Write-Host ""
     Write-Host " [X] ERROR: Download failed! Check your connection or GitHub URL." -ForegroundColor Red
@@ -101,7 +99,7 @@ try {
 # ==========================================
 # 🚚 解壓與智慧型覆蓋
 # ==========================================
-Write-Host "[🚚 EXTRACTING]" -ForegroundColor Yellow -NoNewline
+Write-Host "[>][EXTRACTING]" -ForegroundColor Yellow -NoNewline
 Write-Host " Deploying package files to core repository..." -ForegroundColor Gray
 
 try {
@@ -119,16 +117,16 @@ try {
     
     Write-Host ""
     Write-Host "==================================================" -ForegroundColor Cyan
-    Write-Host " 🎉 SYSTEM DEPLOYMENT COMPLETED SUCCESSFULLY!" -ForegroundColor Green
+    Write-Host "   SYSTEM DEPLOYMENT COMPLETED SUCCESSFULLY!" -ForegroundColor Green
     Write-Host "==================================================" -ForegroundColor Cyan
     Write-Host ""
     
     # 自動重啟 Steam
     if (Test-Path (Join-Path $SteamPath "steam.exe")) {
-        Write-Host "[🔄 REBOOTING]" -ForegroundColor Yellow -NoNewline
+        Write-Host "[>][REBOOTING]" -ForegroundColor Yellow -NoNewline
         Write-Host " Launching Steam client application..." -ForegroundColor Gray
         Start-Process -FilePath (Join-Path $SteamPath "steam.exe")
-        Write-Host " [✓] Steam is now active." -ForegroundColor Green
+        Write-Host " [V] Steam is now active." -ForegroundColor Green
     }
 } catch {
     Write-Host ""
