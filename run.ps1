@@ -4,18 +4,12 @@
 Clear-Host
 $Host.UI.RawUI.WindowTitle = "L1N AUTOMATIC DEPLOY TOOL v1.0"
 
-Write-Host "==================================================" -ForegroundColor Red
-Write-Host " $$$$$$$$\ $$$$$$$$\ $$$$$$$$\ " -ForegroundColor Red
-Write-Host " \____$$  |\____$$  |\____$$  |" -ForegroundColor Red
-Write-Host "     $$  /     $$  /     $$  / " -ForegroundColor Red
-Write-Host "    $$  /     $$  /     $$  /  " -ForegroundColor Red
-Write-Host "   $$  /     $$  /     $$  /   " -ForegroundColor Red
-Write-Host "  $$  /     $$  /     $$  /    " -ForegroundColor Red
-Write-Host " $$  /     $$  /     $$  /     " -ForegroundColor Red
-Write-Host " \__/      \__/      \__/      " -ForegroundColor Red
-Write-Host "                               " -ForegroundColor Red
-Write-Host "       >> MAIN CORE DEPLOY ACTIVE v1.0 <<  " -ForegroundColor Red
-Write-Host "==================================================" -ForegroundColor Red
+Write-Host "==================================================" -ForegroundColor DarkGreen
+Write-Host " [>>>]  L1N MAIN CORE DEPLOY SYSTEM ACTIVE  [<<<]" -ForegroundColor Green
+Write-Host "==================================================" -ForegroundColor DarkGreen
+Write-Host " [+ System status: ON-LINE ]" -ForegroundColor Cyan
+Write-Host " [+ Network core : CONNECTED ]" -ForegroundColor Cyan
+Write-Host " [==================== 100% ====================]" -ForegroundColor Yellow
 Write-Host ""
 
 
