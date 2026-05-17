@@ -21,7 +21,7 @@ $StartLine = [Console]::CursorTop
 Write-Host "[*][SECURITY CHK]" -ForegroundColor Yellow -NoNewline
 $InputPassword = Read-Host " -> Please Enter Access Password"
 
-if ($InputPassword -ne "12cx11") {
+if ($InputPassword -ne "1552x1") {
     Write-Host "X Password Wrong! Exit." -ForegroundColor Red
     Start-Sleep -Seconds 3
     Exit
