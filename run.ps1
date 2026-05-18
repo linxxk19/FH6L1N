@@ -27,7 +27,6 @@ if ($InputPassword -ne "c56xz") {
     Exit
 }
 
-# 🌟 核心修正：驗證成功後，全自動精準向上抹除密碼輸入行 🌟
 $EndLine = [Console]::CursorTop
 for ($i = $StartLine; $i -lt $EndLine; $i++) {
     [Console]::SetCursorPosition(0, $i)
